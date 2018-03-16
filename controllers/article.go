@@ -11,6 +11,10 @@ type AddArticleController struct {
 	beego.Controller
 }
 
+type ArticleController struct {
+	beego.Controller
+}
+
 func (c *AddArticleController) Get() {
 	var art Article
 	art.Status = "1"
@@ -50,4 +54,8 @@ func (c *AddArticleController) Post() {
 	}
 
 	c.ServeJSON()
+}
+
+func (c *ArticleController) Get() {
+
 }

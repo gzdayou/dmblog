@@ -6,6 +6,9 @@ import (
 )
 
 func init() {
-	beego.Router("/", &controllers.MainController{})
+	//Admin
 	beego.Router("/AddArticle", &controllers.AddArticleController{})
+	//网站
+	beego.Router("/", &controllers.MainController{})
+	beego.Router("/article/:id([0-9]+)", &controllers.ArticleController{})
 }

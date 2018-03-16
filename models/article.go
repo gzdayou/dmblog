@@ -62,6 +62,35 @@ func AddArticle(updArt Article) (int64, error) {
 	return id, err
 }
 
-func ListArticle() {
-	
+func ListArticle(condition map[string]string, page int, limit int) (num int64, list []Article, err error) {
+	o := orm.NewOrm()
+	qs := o.QueryTable(beego.AppConfig.String("dbprefix") + "article")
+	cond := orm.NewCondition()
+	if condition["keyword"] != "" {
+		cond = cond.And("title__icontains", condition["keyword"])
+	}
+	if condition["status"] != "" {
+		cond = cond.And("status", condition["status"])
+	}
+	qs = qs.SetCond(cond)
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+	start := (page - 1) * limit
+
+	var articles []Article
+	num, err1 := qs.Limit(limit, start).All(&articles)
+	return num, articles, err1
+}
+
+func GetArticle(id int64) (Article, error) {
+	o := orm.NewOrm()
+	art := Article{Cid: id}
+
+	err := o.Read(&art)
+
+	return art, err
 }

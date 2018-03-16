@@ -3,6 +3,8 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	. "blog/models"
+	. "blog/base"
+	//"encoding/json"
 )
 
 type MainController struct {
@@ -10,18 +12,19 @@ type MainController struct {
 }
 
 func (c *MainController) Get() {
-	var art Article
-	art.Title = "测试标题"
-
-	id, err := AddArticle(art)
+	condition := make(map[string]string)
+	condition["title"] = "abcdefg"
+	
+	num, list, err := ListArticle(condition, 1, 10)
 	if err == nil {
-		c.Data["json"] = map[string]interface{}{"code": 1, "message": "博客添加成功", "id": id}
+		c.Data["num"] = num
+		// b,_ := json.Marshal(list)
+		// c.Ctx.WriteString(string(b))
+		c.Data["list"] = list
+		theme := GetTheme()
+		tplname := "themes/"+ theme +"/index.tpl"
+		c.TplName = tplname
 	} else {
-		c.Data["json"] = map[string]interface{}{"code": 0, "message": err}
+		c.Abort("401")
 	}
-	c.ServeJSON()
-
-	// c.Data["Website"] = "beego.me"
-	// c.Data["Email"] = "astaxie@gmail.com"
-	// c.TplName = "index.tpl"
 }
