@@ -1,5 +1,78 @@
 {{template "themes/default/header.tpl" .}}
 
+<script type="text/javascript">
+(function () {
+    window.TypechoComment = {
+        dom : function (id) {
+            return document.getElementById(id);
+        },
+    
+        create : function (tag, attr) {
+            var el = document.createElement(tag);
+        
+            for (var key in attr) {
+                el.setAttribute(key, attr[key]);
+            }
+        
+            return el;
+        },
+
+        reply : function (cid, coid) {console.log("abcd")
+            var comment = this.dom(cid), parent = comment.parentNode,
+                response = this.dom('respond-post-{{.art.Cid}}'), input = this.dom('comment-parent'),
+                form = 'form' == response.tagName ? response : response.getElementsByTagName('form')[0],
+                textarea = response.getElementsByTagName('textarea')[0];
+console.log("bcde")
+            if (null == input) {
+                input = this.create('input', {
+                    'type' : 'hidden',
+                    'name' : 'parent',
+                    'id'   : 'comment-parent'
+                });
+
+                form.appendChild(input);
+            }
+
+            input.setAttribute('value', coid);
+
+            if (null == this.dom('comment-form-place-holder')) {
+                var holder = this.create('div', {
+                    'id' : 'comment-form-place-holder'
+                });
+
+                response.parentNode.insertBefore(holder, response);
+            }
+
+            comment.appendChild(response);
+            this.dom('cancel-comment-reply-link').style.display = '';
+
+            if (null != textarea && 'text' == textarea.name) {
+                textarea.focus();
+            }
+
+            return false;
+        },
+
+        cancelReply : function () {
+            var response = this.dom('respond-post-{{.art.Cid}}'),
+            holder = this.dom('comment-form-place-holder'), input = this.dom('comment-parent');
+
+            if (null != input) {
+                input.parentNode.removeChild(input);
+            }
+
+            if (null == holder) {
+                return true;
+            }
+
+            this.dom('cancel-comment-reply-link').style.display = 'none';
+            holder.parentNode.insertBefore(response, holder);
+            return false;
+        }
+    };
+})();
+</script>
+
 <main>
     <div class="wrap min">
         <section class="post-title">
@@ -29,7 +102,7 @@
         </ul>
         <section id="comments" class="post-comments">
             <h3>没有评论</h3>
-            <div id="respond-post-3" class="respond">
+            <div id="respond-post-{{.art.Cid}}" class="respond">
                 <span class="cancel-comment-reply">
                     <a id="cancel-comment-reply-link" href="/article/{{.art.Cid}}/#respond-post-{{.art.Cid}}" rel="nofollow" style="display:none" onclick="return TypechoComment.cancelReply();">取消回复</a>
                 </span>

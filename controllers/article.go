@@ -110,7 +110,8 @@ func CommentsList(Cid int64) string {
 func SubCommentsList(list []Comments, max int) string {
 	s := `<ol class="comment-list">`
 	for _, comment := range list {
-		s += `<li id="comment-` + string(comment.Coid) + `">`
+		sLi := fmt.Sprintf("<li id=\"comment-%d\">", comment.Coid)
+		s += sLi
 		avatarMd5 := ToMd5(comment.Author)
 		s += `<img class="avatar" src="http://www.gravatar.com/avatar/`+ avatarMd5 +`?s=150&amp;r=G&amp;d=robohash" alt="duomi" width="150" height="150" />`
 		s += `<div class="comment-meta">`
@@ -122,7 +123,7 @@ func SubCommentsList(list []Comments, max int) string {
 		}
 		s += `</span>`
 		s += `<time class="comment-time">18.03.14</time>`
-		line := fmt.Sprintf("<span class=\"comment-reply\"><a href=\"/article/%d/?replyTo=%d#respond-post-%d\" rel=\"nofollow\" onclick=\"return TypechoComment.reply('comment-%d', %d);\">回复</a></span>", comment.Cid, comment.Coid, comment.Cid, comment.Coid, comment.Coid)
+		line := fmt.Sprintf("<span class=\"comment-reply\"><a href=\"#\" rel=\"javascript::void(0);\" onclick=\"return TypechoComment.reply('comment-%d', %d);\">回复</a></span>", comment.Coid, comment.Coid)
 		s += line
 		s += `</div>`
 		s += `<div class="comment-content">`
