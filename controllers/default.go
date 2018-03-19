@@ -7,10 +7,12 @@ import (
 	//"encoding/json"
 )
 
+//MainController 首页控制器结构体
 type MainController struct {
 	beego.Controller
 }
 
+//Get MainController 首页控制器
 func (c *MainController) Get() {
 	condition := make(map[string]string)
 	condition["title"] = "abcdefg"
