@@ -1,12 +1,14 @@
 package models
 
 import (
+	. "blog/base"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
-	. "blog/base"
 )
 
+//Article 博文model结构体类型
 type Article struct {
 	Cid          int64 `orm:"pk"`
 	Title        string
@@ -24,10 +26,11 @@ type Article struct {
 	AllowComment int
 	AllowPing    int
 	AllowFeed    int
-	Parent      int64
+	Parent       int64
 	Views        int64
 }
 
+//TableName 表名
 func (a *Article) TableName() string {
 	return "article"
 }
@@ -37,6 +40,7 @@ func init() {
 	orm.RegisterModelWithPrefix(beego.AppConfig.String("dbprefix"), new(Article))
 }
 
+//AddArticle 添加博文
 func AddArticle(updArt Article) (int64, error) {
 	o := orm.NewOrm()
 	art := new(Article)
@@ -62,6 +66,7 @@ func AddArticle(updArt Article) (int64, error) {
 	return id, err
 }
 
+//ListArticle 获取博文列表
 func ListArticle(condition map[string]string, page int, limit int) (num int64, list []Article, err error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(beego.AppConfig.String("dbprefix") + "article")
@@ -82,15 +87,40 @@ func ListArticle(condition map[string]string, page int, limit int) (num int64, l
 	start := (page - 1) * limit
 
 	var articles []Article
-	num, err1 := qs.Limit(limit, start).All(&articles)
+	num, err1 := qs.OrderBy("-Cid").Limit(limit, start).All(&articles)
 	return num, articles, err1
 }
 
+//GetArticle 根据博文ID获取博文详情
 func GetArticle(id int64) (Article, error) {
 	o := orm.NewOrm()
 	art := Article{Cid: id}
-
 	err := o.Read(&art)
 
 	return art, err
+}
+
+//GetPreArticle 获取上一篇博文
+func GetPreArticle(id int64) (int64, string) {
+	o := orm.NewOrm()
+	var art Article
+	err := o.Raw("SELECT cid, title FROM "+beego.AppConfig.String("dbprefix")+"article WHERE cid = (SELECT max(cid) FROM "+beego.AppConfig.String("dbprefix")+"article WHERE cid < ?)", id).QueryRow(&art)
+	if err == nil {
+		return art.Cid, art.Title
+	}
+
+	return 0, ""
+}
+
+//GetNextArticle 获取下一篇博文
+func GetNextArticle(id int64) (int64, string) {
+
+	o := orm.NewOrm()
+	var art Article
+	err := o.Raw("SELECT cid, title FROM "+beego.AppConfig.String("dbprefix")+"article WHERE cid = (SELECT min(cid) FROM "+beego.AppConfig.String("dbprefix")+"article WHERE cid > ?)", id).QueryRow(&art)
+	if err == nil {
+		return art.Cid, art.Title
+	}
+
+	return 0, ""
 }

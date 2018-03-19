@@ -7,13 +7,15 @@ import (
 	"github.com/astaxie/beego/orm"
 	_"github.com/go-sql-driver/mysql"
 	"strings"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 func init() {
 	//InitSQL()
 }
 
-//初始化数据库连接
+//InitSQL 初始化数据库连接
 func InitSQL() {
 	user := beego.AppConfig.String("dbuser")
 	passwd := beego.AppConfig.String("dbpass")
@@ -28,22 +30,30 @@ func InitSQL() {
 	orm.RegisterDataBase("default", "mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", user, passwd, host, port, dbname))
 }
 
-//获取当前模板主题名称
+//GetTheme 获取当前模板主题名称
 func GetTheme() string {
 	str := "default"
 	return str
 }
 
-//自定义模板处理函数
+//Strreplace 自定义模板处理函数
 func Strreplace(in string, search string, replace string)(out string){
 	out = strings.Replace(in, search, replace, -1)
 	return
 }
 
-//时间戳转日期模板处理函数
+//StampToDatetime 时间戳转日期模板处理函数
 func StampToDatetime(input int64) string {
 	timeLayout := "2006-01-02 15:04:05" 
 	tm := time.Unix(input, 0)
 	dataTimeStr := tm.Format(timeLayout)
 	return dataTimeStr
+}
+
+//ToMd5 md5转换
+func ToMd5(s string) string {
+	md5Ctx := md5.New()
+	md5Ctx.Write([]byte(s))
+    cipherStr := md5Ctx.Sum(nil)
+    return hex.EncodeToString(cipherStr)
 }

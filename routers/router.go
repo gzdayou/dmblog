@@ -11,4 +11,5 @@ func init() {
 	//网站
 	beego.Router("/", &controllers.MainController{})
 	beego.Router("/article/:id([0-9]+)", &controllers.ArticleController{})
+	beego.Router("/AddComments", &controllers.AddCommentsController{})
 }

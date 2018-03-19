@@ -4,7 +4,7 @@
     <div class="wrap min">
         <section class="home-title">
             <h1>Hello World</h1>
-            <span>Just So So ...</span>
+            <span>不为模糊不清的未来担忧，只为清清楚楚的现在努力。。。</span>
         </section>
         <section class="home-posts">
             {{range .list}}

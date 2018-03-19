@@ -4,7 +4,7 @@
     </div>
     <div class="wrap min">
         <section class="sub-footer">
-            <p>© 2018 <a href="http://localhost/typecho/">Hello World</a>. All Rights Reserved. Theme By <a href="https://github.com/Dreamer-Paul/Single" target="_blank" rel="nofollow">Single</a>.</p>
+            <p>© 2018 <a href="/">Hello World</a>. All Rights Reserved. Theme By <a href="https://github.com/Dreamer-Paul/Single" target="_blank" rel="nofollow">Single</a>.</p>
         </section>
     </div>
 </footer>
