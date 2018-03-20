@@ -2,7 +2,7 @@ package controllers
 
 import (
 	//"strconv"
-	. "blog/models"
+	"blog/models"
 	//"fmt"
 	//. "blog/base"
 	"github.com/astaxie/beego"
@@ -40,9 +40,9 @@ func (c *DologinController) Post() {
 
 	condition := make(map[string]string)
 	condition["name"] = name
-	user, err := GetUser(condition)
+	user, err := models.GetUser(condition)
 
-	if err == nil && user.Uid > 0 && CheckPassword(user, password) {
+	if err == nil && user.Uid > 0 && models.CheckPassword(user, password) {
 		SetUserSession(user, c)
 		c.Data["json"] = map[string]interface{}{"code": 1, "message": "登录成功"}
 	} else {
@@ -53,7 +53,7 @@ func (c *DologinController) Post() {
 }
 
 //SetUserSession 保存session
-func SetUserSession(u Users, c *DologinController) {
+func SetUserSession(u models.Users, c *DologinController) {
 	c.SetSession("is_login", 1)
 	c.SetSession("user_session", u)
 }

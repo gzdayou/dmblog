@@ -2,17 +2,17 @@ package main
 
 import (
 	_ "blog/routers"
-	. "blog/base"
 	"github.com/astaxie/beego"
+	"blog/tools"
 )
 
 func main() {
 	beego.SetStaticPath("/adresource","views/admin")
-	theme := GetTheme()
+	theme := tools.GetTheme()
 	beego.SetStaticPath("/themepth","views/themes/" + theme)
 	
 	//注册自定义模板函数
-	AddSelfTemplateFuncs()
+	tools.AddSelfTemplateFuncs()
 
 	beego.Run()
 }

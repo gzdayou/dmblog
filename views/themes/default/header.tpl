@@ -28,8 +28,7 @@
         <li><a href="/">首页</a></li>
         <li class="has-child">
             <a>分类</a>
-            <ul class="sub-menu">
-                <li><a href="/default">默认分类</a></li>            </ul>
+            {{str2html getHeaderCatlist}}
         </li>
         <li><a href="/start-page.html">关于</a></li>    </ul>
 </header> 

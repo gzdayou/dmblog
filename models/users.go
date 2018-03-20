@@ -2,7 +2,7 @@ package models
 
 import (
 	//"fmt"
-	. "blog/base"
+	"blog/base"
 	//"golang.org/x/crypto/scrypt" 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -55,7 +55,7 @@ func GetUser(condition map[string]string) (u Users, err error) {
 
 //CheckPassword 验证密码是否正确
 func CheckPassword(u Users, p string) bool {
-	dk := ToMd5(p + u.AuthCode)
+	dk := base.ToMd5(p + u.AuthCode)
 	if string(dk) == u.Password {
 		return true
 	}

@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	. "blog/base"
-	. "blog/models"
+	//"blog/base"
+	"blog/models"
+	"blog/tools"
 	"fmt"
 	"strconv"
 	"time"
-
 	"github.com/astaxie/beego"
 	"github.com/russross/blackfriday"
 )
@@ -38,7 +38,7 @@ func (c *AddArticleController) Get() {
 	}
 
 	//加载分类列表（暂时只用二级）
-	_, list, _ := ListCategories(0)
+	_, list, _ := models.ListCategories(0)
 	c.Data["list"] = list
 
 	tplname := "admin/template/article/add-form.tpl"
@@ -48,7 +48,7 @@ func (c *AddArticleController) Get() {
 
 //Post AddArticleController 添加博客文章
 func (c *AddArticleController) Post() {
-	var art Article
+	var art models.Article
 	local, _ := time.LoadLocation("Asia/Chongqing")
 	tm2, _ := time.ParseInLocation("2006-01-02 15:04", c.GetString("date"), local)
 	art.Title = c.GetString("title")
@@ -69,7 +69,7 @@ func (c *AddArticleController) Post() {
 	art.Parent = 0
 	art.Views = 0
 
-	id, err := AddArticle(art, c.GetStrings("category[]"))
+	id, err := models.AddArticle(art, c.GetStrings("category[]"))
 	if err == nil {
 		c.Redirect(fmt.Sprintf("/article/%d", id), 302)
 	} else {
@@ -83,16 +83,16 @@ func (c *AddArticleController) Post() {
 func (c *ArticleController) Get() {
 	id := c.Ctx.Input.Param(":id")
 	cid, _ := strconv.ParseInt(id, 10, 64)
-	art, err := GetArticle(cid)
+	art, err := models.GetArticle(cid)
 
 	if err == nil {
 		//评论列表
 		cmtlist := CommentsList(cid)
 		c.Data["cmtlist"] = cmtlist
 		//上一篇
-		preCid, preTitle := GetPreArticle(cid)
+		preCid, preTitle := models.GetPreArticle(cid)
 		//下一篇
-		nextCid, nextTitle := GetNextArticle(cid)
+		nextCid, nextTitle := models.GetNextArticle(cid)
 		text := string(blackfriday.MarkdownBasic([]byte(art.Text)))
 		c.Data["preCid"] = preCid
 		c.Data["preTitle"] = preTitle
@@ -101,7 +101,7 @@ func (c *ArticleController) Get() {
 		c.Data["text"] = text
 		c.Data["art"] = art
 
-		theme := GetTheme()
+		theme := tools.GetTheme()
 		tplname := "themes/" + theme + "/article.tpl"
 		c.TplName = tplname
 	} else {
@@ -111,7 +111,7 @@ func (c *ArticleController) Get() {
 
 //CommentsList 获取博文列表
 func CommentsList(Cid int64) string {
-	_, list, err := ListComments(Cid, 1, 10)
+	_, list, err := models.ListComments(Cid, 1, 10)
 	if err == nil && len(list) > 0 {
 		s := SubCommentsList(list, 5)
 
@@ -121,12 +121,12 @@ func CommentsList(Cid int64) string {
 }
 
 //SubCommentsList 根据一级评论列表组装详细子评论列表HTML
-func SubCommentsList(list []Comments, max int) string {
+func SubCommentsList(list []models.Comments, max int) string {
 	s := `<ol class="comment-list">`
 	for _, comment := range list {
 		sLi := fmt.Sprintf("<li id=\"comment-%d\">", comment.Coid)
 		s += sLi
-		avatarMd5 := ToMd5(comment.Author)
+		avatarMd5 := tools.ToMd5(comment.Author)
 		s += `<img class="avatar" src="http://www.gravatar.com/avatar/`+ avatarMd5 +`?s=150&amp;r=G&amp;d=robohash" alt="duomi" width="150" height="150" />`
 		s += `<div class="comment-meta">`
 		s += `<span class="comment-author">`
@@ -146,7 +146,7 @@ func SubCommentsList(list []Comments, max int) string {
 		s += `<p>` + comment.Text + `</p>`
 		s += `</div>`
 		//是否还有子评论列表
-		_, listSub, err := GetCommentsByid(comment.Coid)
+		_, listSub, err := models.GetCommentsByid(comment.Coid)
 		if err == nil && len(listSub) > 0 && max >= 1 {
 			n := max - 1
 			s += `<div class="comment-children">`
@@ -163,18 +163,18 @@ func SubCommentsList(list []Comments, max int) string {
 func (c *EditArticleController) Get() {
 	id := c.Ctx.Input.Param(":id")
 	cid, _ := strconv.ParseInt(id, 10, 64)
-	art, err := GetArticle(cid)
+	art, err := models.GetArticle(cid)
 
 	if err == nil {
 		c.Data["art"] = art
-		c.Data["created"] = StampToDatetime(art.Created)
+		c.Data["created"] = tools.StampToDatetime(art.Created)
 
 		//加载分类列表（暂时只用二级）
-		_, list, _ := ListCategories(0)
+		_, list, _ := models.ListCategories(0)
 		c.Data["list"] = list
 
 		//文章目录
-		r, _ := GetArticleCats(cid)
+		r, _ := models.GetArticleCats(cid)
 		relate := make(map[int64]bool)
 		for _, row := range(r) {
 			relate[row.Mid] = true
@@ -195,7 +195,7 @@ func (c * DoEditArticleController) Post() {
 	id := c.Ctx.Input.Param(":id")
 	cid, _ := strconv.ParseInt(id, 10, 64)
 
-	var art Article
+	var art models.Article
 	local, _ := time.LoadLocation("Asia/Chongqing")
 	tm2, _ := time.ParseInLocation("2006-01-02 15:04", c.GetString("date"), local)
 	art.Cid = cid
@@ -204,7 +204,7 @@ func (c * DoEditArticleController) Post() {
 	art.Created = tm2.Unix()
 	art.Modified = time.Now().Unix()
 	art.Text = c.GetString("text")
-	if err := EditArticle(art, c.GetStrings("category[]")); err == nil {
+	if err := models.EditArticle(art, c.GetStrings("category[]")); err == nil {
 		c.Redirect(fmt.Sprintf("/article/%d", cid), 302)
 	}
 

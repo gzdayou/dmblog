@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"strconv"
-	. "blog/models"
+	"blog/models"
 	"fmt"
 	//. "blog/base"
 	"github.com/astaxie/beego"
@@ -19,7 +19,7 @@ func (c *AddCommentsController) Post() {
 	cid, _ := strconv.ParseInt(c.GetString("cid"), 10, 64)
 	parent, _ := strconv.ParseInt(c.GetString("parent"), 10, 64)
 
-	var cmt Comments
+	var cmt models.Comments
 	cmt.Cid = cid
 	cmt.Author = c.GetString("author")
 	cmt.Authorid = 0
@@ -31,7 +31,7 @@ func (c *AddCommentsController) Post() {
 	cmt.Text = c.GetString("text")
 	cmt.Parent = parent
 
-	id, err := AddComments(cmt)
+	id, err := models.AddComments(cmt)
 	if err == nil {
 		rURL := fmt.Sprintf("/article/%d/#comment-%d", cid, id)
 		c.Redirect(rURL, 302)
