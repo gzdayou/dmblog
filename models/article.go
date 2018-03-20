@@ -1,8 +1,8 @@
 package models
 
 import (
-	. "blog/base"
-
+	//. "blog/base"
+	"strconv"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
@@ -36,13 +36,15 @@ func (a *Article) TableName() string {
 }
 
 func init() {
-	InitSQL()
+	//InitSQL()
 	orm.RegisterModelWithPrefix(beego.AppConfig.String("dbprefix"), new(Article))
 }
 
 //AddArticle 添加博文
-func AddArticle(updArt Article) (int64, error) {
+func AddArticle(updArt Article, category []string) (int64, error) {
 	o := orm.NewOrm()
+	err := o.Begin() //开启事务
+
 	art := new(Article)
 	art.Title = updArt.Title
 	art.Slug = "test3"
@@ -63,7 +65,62 @@ func AddArticle(updArt Article) (int64, error) {
 	art.Views = 0
 
 	id, err := o.Insert(art)
+
+	if err != nil {
+		err = o.Rollback()
+	}
+
+	//保存分类
+	for i := 0; i < len(category); i++ {
+		var r Relationships
+		r.Cid = id
+		mid, _ := strconv.ParseInt(category[i], 10, 64)
+		r.Mid = mid
+		_, err := o.Insert(&r)
+		if err != nil {
+			err = o.Rollback()
+		}
+	}
+	err = o.Commit()
+
 	return id, err
+}
+
+//EditArticle 编辑博文
+func EditArticle(updArt Article, category []string) error {
+	o := orm.NewOrm()
+	err := o.Begin() //开启事务
+
+	art := Article{Cid: updArt.Cid}
+	if o.Read(&art) == nil {
+		art.Title = updArt.Title
+		art.Slug = "test3"
+		art.Created = updArt.Created
+		art.Modified = updArt.Modified
+		art.Text = "<!--markdown-->" + updArt.Text
+		if _, e := o.Update(&art); e != nil {
+			err = o.Rollback()
+		}
+
+		//删除旧分类关系，写入新分类关系
+		if e := DeleteRelate(updArt.Cid); e != nil {
+			err = o.Rollback()
+		}
+		//保存分类
+		for i := 0; i < len(category); i++ {
+			var r Relationships
+			r.Cid = updArt.Cid
+			mid, _ := strconv.ParseInt(category[i], 10, 64)
+			r.Mid = mid
+			_, err := o.Insert(&r)
+			if err != nil {
+				err = o.Rollback()
+			}
+		}
+		err = o.Commit()
+	}
+
+	return err
 }
 
 //ListArticle 获取博文列表

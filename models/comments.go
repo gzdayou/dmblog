@@ -1,7 +1,7 @@
 package models
 
 import (
-	. "blog/base"
+	//. "blog/base"
 	"time"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -32,7 +32,7 @@ func (c *Comments) TableName() string {
 }
 
 func init() {
-	InitSQL()
+	//InitSQL()
 	orm.RegisterModelWithPrefix(beego.AppConfig.String("dbprefix"), new(Comments))
 }
 

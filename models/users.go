@@ -1,8 +1,9 @@
 package models
 
 import (
+	//"fmt"
 	. "blog/base"
-	//"time"
+	//"golang.org/x/crypto/scrypt" 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
@@ -30,7 +31,7 @@ func (c *Users) TableName() string {
 }
 
 func init() {
-	InitSQL()
+	//InitSQL()
 	orm.RegisterModelWithPrefix(beego.AppConfig.String("dbprefix"), new(Users))
 }
 
@@ -42,12 +43,21 @@ func GetUser(condition map[string]string) (u Users, err error) {
 	if condition["name"] != "" {
 		cond = cond.And("name", condition["name"])
 	}
-	if condition["password"] != "" {
-		cond = cond.And("password", condition["password"])
+	if condition["uid"] != "" {
+		cond = cond.And("uid", condition["uid"])
 	}
 	qs = qs.SetCond(cond)
 
 	var user Users
-	err1 := qs.OrderBy("-Uid").One(&user)
+	err1 := qs.One(&user)
 	return user, err1
+}
+
+//CheckPassword 验证密码是否正确
+func CheckPassword(u Users, p string) bool {
+	dk := ToMd5(p + u.AuthCode)
+	if string(dk) == u.Password {
+		return true
+	}
+	return false
 }

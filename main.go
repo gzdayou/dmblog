@@ -12,8 +12,7 @@ func main() {
 	beego.SetStaticPath("/themepth","views/themes/" + theme)
 	
 	//注册自定义模板函数
-	beego.AddFuncMap("strreplace", Strreplace)
-	beego.AddFuncMap("stampToDatetime", StampToDatetime)
+	AddSelfTemplateFuncs()
 
 	beego.Run()
 }

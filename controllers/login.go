@@ -18,6 +18,11 @@ type DologinController struct {
 	beego.Controller
 }
 
+//LogoutController 退出登录控制器结构体
+type LogoutController struct {
+	beego.Controller
+}
+
 //Get LoginController 后台登陆页面
 func (c *LoginController) Get() {
 	c.TplName = "admin/template/login/form.tpl"
@@ -35,14 +40,26 @@ func (c *DologinController) Post() {
 
 	condition := make(map[string]string)
 	condition["name"] = name
-	condition["password"] = password
 	user, err := GetUser(condition)
 
-	if err == nil && user.Uid > 0 {
+	if err == nil && user.Uid > 0 && CheckPassword(user, password) {
+		SetUserSession(user, c)
 		c.Data["json"] = map[string]interface{}{"code": 1, "message": "登录成功"}
 	} else {
 		c.Data["json"] = map[string]interface{}{"code": 0, "message": "账号或密码错误"}
 	}
 
 	c.ServeJSON()
+}
+
+//SetUserSession 保存session
+func SetUserSession(u Users, c *DologinController) {
+	c.SetSession("is_login", 1)
+	c.SetSession("user_session", u)
+}
+
+//Get LoginController 后台登陆页面
+func (c *LogoutController) Get() {
+	c.DestroySession()
+	c.Redirect("/login", 302)
 }

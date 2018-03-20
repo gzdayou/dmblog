@@ -1,18 +1,19 @@
 package base
 
 import (
-	"fmt"
-	"time"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/orm"
-	_"github.com/go-sql-driver/mysql"
-	"strings"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func init() {
-	//InitSQL()
+	InitSQL()
 }
 
 //InitSQL 初始化数据库连接
@@ -37,14 +38,14 @@ func GetTheme() string {
 }
 
 //Strreplace 自定义模板处理函数
-func Strreplace(in string, search string, replace string)(out string){
+func Strreplace(in string, search string, replace string) (out string) {
 	out = strings.Replace(in, search, replace, -1)
 	return
 }
 
 //StampToDatetime 时间戳转日期模板处理函数
 func StampToDatetime(input int64) string {
-	timeLayout := "2006-01-02 15:04:05" 
+	timeLayout := "2006-01-02 15:04:05"
 	tm := time.Unix(input, 0)
 	dataTimeStr := tm.Format(timeLayout)
 	return dataTimeStr
@@ -54,6 +55,29 @@ func StampToDatetime(input int64) string {
 func ToMd5(s string) string {
 	md5Ctx := md5.New()
 	md5Ctx.Write([]byte(s))
-    cipherStr := md5Ctx.Sum(nil)
-    return hex.EncodeToString(cipherStr)
+	cipherStr := md5Ctx.Sum(nil)
+	return hex.EncodeToString(cipherStr)
+}
+
+//AddSelfTemplateFuncs 注册自定义模板函数
+func AddSelfTemplateFuncs() {
+	beego.AddFuncMap("strreplace", Strreplace)
+	beego.AddFuncMap("stampToDatetime", StampToDatetime)
+}
+
+//SliceContains slice中是否包含某个值
+func SliceContains(src []string, value string) bool {
+	isContain := false
+	for _, srcValue := range src {
+		if srcValue == value {
+			isContain = true
+			break
+		}
+	}
+	return isContain
+}
+
+//GetHeaderCatlist 前端页面头部分类列表
+func GetHeaderCatlist() string {
+	
 }

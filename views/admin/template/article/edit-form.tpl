@@ -1,22 +1,22 @@
 <div class="main">
     <div class="body container">
         <div class="typecho-page-title">
-    <h2>撰写新文章</h2>
+    <h2>编辑文章</h2>
 </div>
         <div class="row typecho-page-main typecho-post-area" role="form">
-            <form action="/AddArticle?_=d585f8eb5769324c17e304cbd6052dd2" method="post" name="write_post">
+            <form action="/article/doedit/{{.art.Cid}}" method="post" name="write_post">
                 <div class="col-mb-12 col-tb-9" role="main">
                     
                     <p class="title">
                         <label for="title" class="sr-only">标题</label>
-                        <input type="text" id="title" name="title" autocomplete="off" value="" placeholder="标题" class="w-100 text title" />
+                        <input type="text" id="title" name="title" autocomplete="off" value="{{.art.Title}}" placeholder="标题" class="w-100 text title" />
                     </p>
-                                        <p class="mono url-slug">
+                    <p class="mono url-slug">
                         <label for="slug" class="sr-only">网址缩略名</label>
                         localhost/typecho/index.php/archives/{cid}/                    </p>
                     <p>
                         <label for="text" class="sr-only">文章内容</label>
-                        <textarea style="height: 350px" autocomplete="off" id="text" name="text" class="w-100 mono"></textarea>
+                        <textarea style="height: 350px" autocomplete="off" id="text" name="text" class="w-100 mono">{{strreplace .art.Text "<!--markdown-->" ""}}</textarea>
                     </p>
                     
                                         <section id="custom-field" class="typecho-post-option fold">
@@ -76,16 +76,22 @@
                     <div id="tab-advance" class="tab-content">
                         <section class="typecho-post-option" role="application">
                             <label for="date" class="typecho-label">发布日期</label>
-                            <p><input class="typecho-date w-100" type="text" name="date" id="date" value="" /></p>
+                            <p><input class="typecho-date w-100" type="text" name="date" id="date" value="{{.created}}" /></p>
                         </section>
 
                         <section class="typecho-post-option category-option">
                             <label class="typecho-label">分类</label>
                                 <ul>
-                                    {{range .list}}
-                                    <li><input type="checkbox" id="category-{{.Mid}}" value="{{.Mid}}" name="category[]" />
-                                        <label for="category-{{.Mid}}">{{.Name}}</label>
+                                    {{range $k, $row := .list}}
+                                    {{if index $.relate $row.Mid}}
+                                    <li><input type="checkbox" id="category-{{$row.Mid}}" checked="true" value="{{$row.Mid}}" name="category[]"  />
+                                        <label for="category-{{$row.Mid}}">{{$row.Name}}</label>
                                     </li>
+                                    {{else}}
+                                    <li><input type="checkbox" id="category-{{$row.Mid}}" value="{{$row.Mid}}" name="category[]"  />
+                                        <label for="category-{{$row.Mid}}">{{$row.Name}}</label>
+                                    </li>
+                                    {{end}}
                                     {{end}}
                                 </ul>
                         </section>

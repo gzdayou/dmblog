@@ -97,7 +97,7 @@ console.log("bcde")
             {{if ne .nextCid 0}}
             <li>下一篇: <a href="/article/{{.nextCid}}" title="{{.nextTitle}}">{{.nextTitle}}</a></li>
             {{else}}
-            <li>下一篇: 看完啦 (つд⊂)</li>
+            <li>下一篇: 没有更多啦 (つд⊂)</li>
             {{end}}
         </ul>
         <section id="comments" class="post-comments">

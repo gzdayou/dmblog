@@ -65,7 +65,13 @@ $(document).ready(function () {
             data: {name : un, password : up},
             dataType: "json",
             success: function (t) {
-                console.log(t)
+                if( t.code == 1 ) {
+                    window.location.href = "/AddArticle";
+                    return ;
+                } else {
+                    alert("账号错误");
+                    return false;
+                }
             }
         });
     });

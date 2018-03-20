@@ -21,18 +21,32 @@ type ArticleController struct {
 	beego.Controller
 }
 
+//EditArticleController 编辑博文页面展示
+type EditArticleController struct {
+	beego.Controller
+}
+
+//DoEditArticleController 编辑博文保存处理
+type DoEditArticleController struct {
+	beego.Controller
+}
+
 //Get AddArticleController ...
 func (c *AddArticleController) Get() {
-	// var art Article
-	// art.Status = "1"
-	// c.Data["art"] = art
+	if c.GetSession("is_login") != 1 {
+		c.Redirect("/login", 302)
+	}
+
+	//加载分类列表（暂时只用二级）
+	_, list, _ := ListCategories(0)
+	c.Data["list"] = list
 
 	tplname := "admin/template/article/add-form.tpl"
 	c.Layout = "admin/template/layout/default.tpl"
 	c.TplName = tplname
 }
 
-//Post AddArticleController ...
+//Post AddArticleController 添加博客文章
 func (c *AddArticleController) Post() {
 	var art Article
 	local, _ := time.LoadLocation("Asia/Chongqing")
@@ -55,14 +69,14 @@ func (c *AddArticleController) Post() {
 	art.Parent = 0
 	art.Views = 0
 
-	id, err := AddArticle(art)
+	id, err := AddArticle(art, c.GetStrings("category[]"))
 	if err == nil {
-		c.Data["json"] = map[string]interface{}{"code": 1, "message": "博客添加成功", "id": id}
+		c.Redirect(fmt.Sprintf("/article/%d", id), 302)
 	} else {
-		c.Data["json"] = map[string]interface{}{"code": 0, "message": "博客添加出错"}
+		c.Redirect("/", 302)
 	}
 
-	c.ServeJSON()
+	//c.ServeJSON()
 }
 
 //Get ArticleController 博文详情方法
@@ -123,8 +137,10 @@ func SubCommentsList(list []Comments, max int) string {
 		}
 		s += `</span>`
 		s += `<time class="comment-time">18.03.14</time>`
-		line := fmt.Sprintf("<span class=\"comment-reply\"><a href=\"#\" rel=\"javascript::void(0);\" onclick=\"return TypechoComment.reply('comment-%d', %d);\">回复</a></span>", comment.Coid, comment.Coid)
-		s += line
+		if max > 1 {
+			line := fmt.Sprintf("<span class=\"comment-reply\"><a href=\"javascript::void(0);\" rel=\"nofollow\" onclick=\"return TypechoComment.reply('comment-%d', %d);\">回复</a></span>", comment.Coid, comment.Coid)
+			s += line
+		}
 		s += `</div>`
 		s += `<div class="comment-content">`
 		s += `<p>` + comment.Text + `</p>`
@@ -141,4 +157,56 @@ func SubCommentsList(list []Comments, max int) string {
 	}
 	s += `</ol>`
 	return s
+}
+
+//Get EditArticleController 编辑博文
+func (c *EditArticleController) Get() {
+	id := c.Ctx.Input.Param(":id")
+	cid, _ := strconv.ParseInt(id, 10, 64)
+	art, err := GetArticle(cid)
+
+	if err == nil {
+		c.Data["art"] = art
+		c.Data["created"] = StampToDatetime(art.Created)
+
+		//加载分类列表（暂时只用二级）
+		_, list, _ := ListCategories(0)
+		c.Data["list"] = list
+
+		//文章目录
+		r, _ := GetArticleCats(cid)
+		relate := make(map[int64]bool)
+		for _, row := range(r) {
+			relate[row.Mid] = true
+		}
+		c.Data["relate"] = relate
+
+		tplname := "admin/template/article/edit-form.tpl"
+		c.Layout = "admin/template/layout/default.tpl"
+		c.TplName = tplname
+	} else {
+		beego.Error(err)
+		c.Abort("401")
+	}
+}
+
+//Post DoEditArticleController 处理编辑博文
+func (c * DoEditArticleController) Post() {
+	id := c.Ctx.Input.Param(":id")
+	cid, _ := strconv.ParseInt(id, 10, 64)
+
+	var art Article
+	local, _ := time.LoadLocation("Asia/Chongqing")
+	tm2, _ := time.ParseInLocation("2006-01-02 15:04", c.GetString("date"), local)
+	art.Cid = cid
+	art.Title = c.GetString("title")
+	art.Slug = "test2"
+	art.Created = tm2.Unix()
+	art.Modified = time.Now().Unix()
+	art.Text = c.GetString("text")
+	if err := EditArticle(art, c.GetStrings("category[]")); err == nil {
+		c.Redirect(fmt.Sprintf("/article/%d", cid), 302)
+	}
+
+	c.Redirect(fmt.Sprintf("/article/edit/%d", cid), 302)
 }
