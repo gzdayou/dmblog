@@ -17,12 +17,12 @@
             return el;
         },
 
-        reply : function (cid, coid) {console.log("abcd")
+        reply : function (cid, coid) {
             var comment = this.dom(cid), parent = comment.parentNode,
                 response = this.dom('respond-post-{{.art.Cid}}'), input = this.dom('comment-parent'),
                 form = 'form' == response.tagName ? response : response.getElementsByTagName('form')[0],
                 textarea = response.getElementsByTagName('textarea')[0];
-console.log("bcde")
+
             if (null == input) {
                 input = this.create('input', {
                     'type' : 'hidden',
@@ -79,7 +79,7 @@ console.log("bcde")
             <h2>{{.art.Title}}</h2>
             <div class="post-meta">
                 <time class="date">{{stampToDatetime .art.Created}}</time>
-                <span class="category"><a href="http://localhost/typecho/index.php/category/default/">默认分类</a></span>
+                {{getCatHTML .art.Cid | str2html}}
                 <span class="comments">{{.art.Views}} °C</span>
             </div>
         </section>
@@ -101,7 +101,7 @@ console.log("bcde")
             {{end}}
         </ul>
         <section id="comments" class="post-comments">
-            <h3>没有评论</h3>
+            <h3>评论</h3>
             <div id="respond-post-{{.art.Cid}}" class="respond">
                 <span class="cancel-comment-reply">
                     <a id="cancel-comment-reply-link" href="/article/{{.art.Cid}}/#respond-post-{{.art.Cid}}" rel="nofollow" style="display:none" onclick="return TypechoComment.cancelReply();">取消回复</a>
@@ -118,6 +118,7 @@ console.log("bcde")
                             <button type="submit" class="btn small">写好了~</button>
                         </fieldset>
                     </div>
+                    {{str2html .xsrfdata }}
                     <input type="hidden" name="cid" value="{{.art.Cid}}">
                 </form>
             </div>

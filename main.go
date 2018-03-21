@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	beego.SetStaticPath("/static","static")
 	beego.SetStaticPath("/adresource","views/admin")
 	theme := tools.GetTheme()
 	beego.SetStaticPath("/themepth","views/themes/" + theme)

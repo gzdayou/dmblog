@@ -24,7 +24,7 @@
     <div class="operate">
                 <a title="最后登录: 昨天 21:10" href="http://localhost/typecho/admin/profile.php" class="author">admin</a>
                 <a class="exit" href="/logout">登出</a>
-                <a href="http://localhost/typecho/">网站</a>
+                <a href="/">网站</a>
     </div>
 </div>
 

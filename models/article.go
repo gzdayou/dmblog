@@ -103,20 +103,23 @@ func EditArticle(updArt Article, category []string) error {
 		}
 
 		//删除旧分类关系，写入新分类关系
-		if e := DeleteRelate(updArt.Cid); e != nil {
-			err = o.Rollback()
-		}
-		//保存分类
-		for i := 0; i < len(category); i++ {
-			var r Relationships
-			r.Cid = updArt.Cid
-			mid, _ := strconv.ParseInt(category[i], 10, 64)
-			r.Mid = mid
-			_, err := o.Insert(&r)
-			if err != nil {
+		if len(category) > 0 {
+			if e := DeleteRelate(updArt.Cid); e != nil {
 				err = o.Rollback()
 			}
+			//保存分类
+			for i := 0; i < len(category); i++ {
+				var r Relationships
+				r.Cid = updArt.Cid
+				mid, _ := strconv.ParseInt(category[i], 10, 64)
+				r.Mid = mid
+				_, err := o.Insert(&r)
+				if err != nil {
+					err = o.Rollback()
+				}
+			}
 		}
+		
 		err = o.Commit()
 	}
 
@@ -180,4 +183,13 @@ func GetNextArticle(id int64) (int64, string) {
 	}
 
 	return 0, ""
+}
+
+//UpdateViews 更新浏览次数
+func UpdateViews(upd *Article) error {
+
+	o := orm.NewOrm()
+	_, err := o.Update(upd)
+
+	return err
 }

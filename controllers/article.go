@@ -40,6 +40,7 @@ func (c *AddArticleController) Get() {
 	//加载分类列表（暂时只用二级）
 	_, list, _ := models.ListCategories(0)
 	c.Data["list"] = list
+	c.Data["xsrfdata"]=c.XSRFFormHTML()
 
 	tplname := "admin/template/article/add-form.tpl"
 	c.Layout = "admin/template/layout/default.tpl"
@@ -48,6 +49,9 @@ func (c *AddArticleController) Get() {
 
 //Post AddArticleController 添加博客文章
 func (c *AddArticleController) Post() {
+	if c.GetSession("is_login") != 1 {
+		c.Redirect("/login", 302)
+	}
 	var art models.Article
 	local, _ := time.LoadLocation("Asia/Chongqing")
 	tm2, _ := time.ParseInLocation("2006-01-02 15:04", c.GetString("date"), local)
@@ -94,12 +98,18 @@ func (c *ArticleController) Get() {
 		//下一篇
 		nextCid, nextTitle := models.GetNextArticle(cid)
 		text := string(blackfriday.MarkdownBasic([]byte(art.Text)))
+		//浏览次数+1
+		views := art.Views + 1
+		art.Views = views
+		models.UpdateViews(&art)
+
 		c.Data["preCid"] = preCid
 		c.Data["preTitle"] = preTitle
 		c.Data["nextCid"] = nextCid
 		c.Data["nextTitle"] = nextTitle
 		c.Data["text"] = text
 		c.Data["art"] = art
+		c.Data["xsrfdata"]=c.XSRFFormHTML()
 
 		theme := tools.GetTheme()
 		tplname := "themes/" + theme + "/article.tpl"
@@ -161,6 +171,9 @@ func SubCommentsList(list []models.Comments, max int) string {
 
 //Get EditArticleController 编辑博文
 func (c *EditArticleController) Get() {
+	if c.GetSession("is_login") != 1 {
+		c.Redirect("/login", 302)
+	}
 	id := c.Ctx.Input.Param(":id")
 	cid, _ := strconv.ParseInt(id, 10, 64)
 	art, err := models.GetArticle(cid)
@@ -180,6 +193,7 @@ func (c *EditArticleController) Get() {
 			relate[row.Mid] = true
 		}
 		c.Data["relate"] = relate
+		c.Data["xsrfdata"]=c.XSRFFormHTML()
 
 		tplname := "admin/template/article/edit-form.tpl"
 		c.Layout = "admin/template/layout/default.tpl"
@@ -190,8 +204,11 @@ func (c *EditArticleController) Get() {
 	}
 }
 
-//Post DoEditArticleController 处理编辑博文
-func (c * DoEditArticleController) Post() {
+//Post EditArticleController 处理编辑博文
+func (c * EditArticleController) Post() {
+	if c.GetSession("is_login") != 1 {
+		c.Redirect("/login", 302)
+	}
 	id := c.Ctx.Input.Param(":id")
 	cid, _ := strconv.ParseInt(id, 10, 64)
 

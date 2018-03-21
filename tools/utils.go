@@ -1,13 +1,25 @@
 package tools
 
 import (
+	"fmt"
 	"strings"
 	"time"
 	"blog/models"
 	"github.com/astaxie/beego"
 	"crypto/md5"
+	"crypto/rand"
 	"encoding/hex"
+	"encoding/base64"
+	"io"
 )
+
+//AddSelfTemplateFuncs 注册自定义模板函数
+func AddSelfTemplateFuncs() {
+	beego.AddFuncMap("strreplace", Strreplace)
+	beego.AddFuncMap("stampToDatetime", StampToDatetime)
+	beego.AddFuncMap("getHeaderCatlist", GetHeaderCatlist)
+	beego.AddFuncMap("getCatHTML", GetCatHTML)
+}
 
 //Strreplace 自定义模板处理函数
 func Strreplace(in string, search string, replace string) (out string) {
@@ -23,20 +35,13 @@ func StampToDatetime(input int64) string {
 	return dataTimeStr
 }
 
-
-//AddSelfTemplateFuncs 注册自定义模板函数
-func AddSelfTemplateFuncs() {
-	beego.AddFuncMap("strreplace", Strreplace)
-	beego.AddFuncMap("stampToDatetime", StampToDatetime)
-	beego.AddFuncMap("getHeaderCatlist", GetHeaderCatlist)
-}
-
 //GetHeaderCatlist 前端页面头部分类列表
 func GetHeaderCatlist() string {
-	models.ListCategories(0)
-
 	s := `<ul class="sub-menu">`
-	s += `<li><a href="/default">默认分类</a></li>`
+	_, list, _ := models.ListCategories(0)
+	for _, cat := range(list) {
+		s += `<li><a href="`+ fmt.Sprintf("/category/%s", cat.Slug) +`">`+ cat.Name +`</a></li>`
+	}
 	s += `</ul>`
 
 	return s
@@ -66,4 +71,52 @@ func SliceContains(src []string, value string) bool {
 		}
 	}
 	return isContain
+}
+
+//GetCatHTML 获取文章所属分类的HTML
+func GetCatHTML(cid int64) string {
+	s := `<span class="category">`
+	//获取分类信息
+	idx := 0
+	relat, _ := models.GetArticleCats(cid)
+	for _, r := range(relat) {
+		if idx > 0  {
+			s += `， `
+		}
+		condition := make(map[string]int64)
+		condition["mid"] = r.Mid
+		c := models.GetCategory(condition)
+		s += `<a href="/category/`+ c.Slug +`">`+ c.Name +`</a>`
+		idx++
+	}
+	s += `</span>`
+
+	return s
+}
+
+//SubString 字串截取
+func SubString(s string, pos, length int) string {
+	runes := []rune(s)
+	l := pos + length
+	if l > len(runes) {
+		l = len(runes)
+	}
+	return string(runes[pos:l])
+}
+
+//GetMd5String md5方法
+func GetMd5String(s string) string {
+	h := md5.New()
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+//GetGUID Guid方法
+func GetGUID() string {
+	b := make([]byte, 48)
+
+	if _, err := io.ReadFull(rand.Reader, b); err != nil {
+		return ""
+	}
+	return GetMd5String(base64.URLEncoding.EncodeToString(b))
 }

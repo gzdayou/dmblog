@@ -15,7 +15,7 @@
                 <p>{{strreplace .Text "<!--markdown-->" ""}}</p>
                 <div class="post-meta">
                     <time class="date"> {{stampToDatetime .Created}}</time>
-                    <span class="category"><a href="http://localhost/typecho/index.php/category/default/">默认分类</a></span>
+                    {{getCatHTML .Cid | str2html}}
                     <span class="comments">{{.Views}} °C</span>
                 </div>
             </div>

@@ -108,9 +108,9 @@ $(document).ready(function() {
     $('#tab-files').bind('init', function () {
         var uploader = new plupload.Uploader({
             browse_button   :   $('.upload-file').get(0),
-            url             :   'http://localhost/typecho/index.php/action/upload?_=d585f8eb5769324c17e304cbd6052dd2',
+            url             :   '/upload',
             runtimes        :   'html5,flash,html4',
-            flash_swf_url   :   'http://localhost/typecho/admin/js/Moxie.swf',
+            flash_swf_url   :   '/adresource/js/Moxie.swf',
             drop_element    :   $('.upload-area').get(0),
             filters         :   {
                 max_file_size       :   '20mb',

@@ -4,7 +4,7 @@
     <h2>撰写新文章</h2>
 </div>
         <div class="row typecho-page-main typecho-post-area" role="form">
-            <form action="/AddArticle?_=d585f8eb5769324c17e304cbd6052dd2" method="post" name="write_post">
+            <form action="/AddArticle" method="post" name="write_post">
                 <div class="col-mb-12 col-tb-9" role="main">
                     
                     <p class="title">
@@ -61,6 +61,7 @@
                             <button type="submit" name="do" value="save" id="btn-save" class="btn">保存草稿</button>
                             <button type="submit" name="do" value="publish" class="btn primary" id="btn-submit">发布文章</button>
                                                         <input type="hidden" name="markdown" value="1" />
+                                                        {{str2html .xsrfdata }}
                                                     </span>
                     </p>
 

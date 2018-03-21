@@ -42,3 +42,21 @@ func ListCategories(p int64) (num int64, list []Categories, err error) {
 	num, err = qs.OrderBy("order").All(&cat)
 	return num, cat, err
 }
+
+//GetCategory 获取分类信息
+func GetCategory(condition map[string]int64) Categories {
+	o := orm.NewOrm()
+	qs := o.QueryTable(beego.AppConfig.String("dbprefix") + "categories")
+	cond := orm.NewCondition()
+	if condition["mid"] > 0 {
+		cond = cond.And("Mid", condition["mid"])
+	}
+	if condition["slug"] > 0 {
+		cond = cond.And("slug", condition["slug"])
+	}
+	qs = qs.SetCond(cond)
+	var cat Categories
+	qs.One(&cat)
+
+	return cat
+}
