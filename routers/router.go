@@ -19,4 +19,5 @@ func init() {
 	beego.Router("/logout", &controllers.LogoutController{})//登出
 	beego.Router("/upload", &controllers.UploadController{})//上传图片
 	beego.Router("/page/:p:string", &controllers.PageController{})//page类型单独页
+	beego.Router("/category/:p:string", &controllers.CategoryController{})//page类型单独页
 }

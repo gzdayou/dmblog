@@ -14,8 +14,8 @@ type MainController struct {
 
 //Get MainController 首页控制器
 func (c *MainController) Get() {
-	condition := make(map[string]string)
-	condition["title"] = "abcdefg"
+	condition := make(map[string]interface{})
+	condition["type"] = "post"
 	
 	num, list, err := models.ListArticle(condition, 1, 10)
 	if err == nil {

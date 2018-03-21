@@ -3,8 +3,8 @@
 <main>
     <div class="wrap min">
         <section class="home-title">
-            <h1>曾祥杰的博客</h1>
-            <span>不为模糊不清的未来担忧，只为清清楚楚的现在努力。。。</span>
+            <h1>“{{.cat.Name}}”</h1>
+            <span>        
         </section>
         <section class="home-posts">
             {{range .list}}

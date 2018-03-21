@@ -127,15 +127,21 @@ func EditArticle(updArt Article, category []string) error {
 }
 
 //ListArticle 获取博文列表
-func ListArticle(condition map[string]string, page int, limit int) (num int64, list []Article, err error) {
+func ListArticle(condition map[string]interface{}, page int, limit int) (num int64, list []Article, err error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(beego.AppConfig.String("dbprefix") + "article")
 	cond := orm.NewCondition()
-	if condition["keyword"] != "" {
+	if condition["keyword"] != nil {
 		cond = cond.And("title__icontains", condition["keyword"])
 	}
-	if condition["status"] != "" {
+	if condition["status"] != nil {
 		cond = cond.And("status", condition["status"])
+	}
+	if condition["type"] != nil {
+		cond = cond.And("type", condition["type"])
+	}
+	if condition["cidin"] != nil {
+		cond = cond.And("cid__in", condition["cidin"])
 	}
 	qs = qs.SetCond(cond)
 	if page < 1 {
@@ -192,4 +198,17 @@ func UpdateViews(upd *Article) error {
 	_, err := o.Update(upd)
 
 	return err
+}
+
+//GetArticleByslug 根据slug获取page类型详情
+func GetArticleByslug(s string) (Article, error) {
+	o := orm.NewOrm()
+	qs := o.QueryTable(beego.AppConfig.String("dbprefix") + "article")
+	cond := orm.NewCondition()
+	cond = cond.And("slug", s)
+	cond = cond.And("type", "page")
+	qs = qs.SetCond(cond)
+	var articles Article
+	err := qs.One(&articles)
+	return articles, err
 }

@@ -30,5 +30,6 @@
             <a>分类</a>
             {{str2html getHeaderCatlist}}
         </li>
-        <li><a href="/start-page.html">关于</a></li>    </ul>
+        <li><a href="/page/about">关于</a></li>    
+    </ul>
 </header> 

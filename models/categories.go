@@ -44,19 +44,19 @@ func ListCategories(p int64) (num int64, list []Categories, err error) {
 }
 
 //GetCategory 获取分类信息
-func GetCategory(condition map[string]int64) Categories {
+func GetCategory(condition map[string]interface{}) (Categories, error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(beego.AppConfig.String("dbprefix") + "categories")
 	cond := orm.NewCondition()
-	if condition["mid"] > 0 {
+	if condition["mid"] != nil {
 		cond = cond.And("Mid", condition["mid"])
 	}
-	if condition["slug"] > 0 {
+	if condition["slug"] != nil {
 		cond = cond.And("slug", condition["slug"])
 	}
 	qs = qs.SetCond(cond)
 	var cat Categories
-	qs.One(&cat)
+	err := qs.One(&cat)
 
-	return cat
+	return cat, err
 }

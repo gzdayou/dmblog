@@ -54,3 +54,17 @@ func DeleteRelate(cid int64) error {
 
 	return err
 }
+
+//GetCateArticles 获取分类下的文章ID
+func GetCateArticles(mid int64)([]Relationships, error) {
+	o := orm.NewOrm()
+	qs := o.QueryTable(beego.AppConfig.String("dbprefix") + "relationships")
+	cond := orm.NewCondition()
+	cond = cond.And("mid", mid)
+	qs = qs.SetCond(cond)
+
+	var r []Relationships
+	_, err := qs.All(&r)
+
+	return r,err
+}

@@ -11,6 +11,8 @@ import (
 	"encoding/hex"
 	"encoding/base64"
 	"io"
+	"github.com/russross/blackfriday"
+	"regexp"
 )
 
 //AddSelfTemplateFuncs 注册自定义模板函数
@@ -19,6 +21,9 @@ func AddSelfTemplateFuncs() {
 	beego.AddFuncMap("stampToDatetime", StampToDatetime)
 	beego.AddFuncMap("getHeaderCatlist", GetHeaderCatlist)
 	beego.AddFuncMap("getCatHTML", GetCatHTML)
+	beego.AddFuncMap("toMarkdown", ToMarkdown)
+	beego.AddFuncMap("trimHTML", TrimHTML)
+	beego.AddFuncMap("subList", SubList)
 }
 
 //Strreplace 自定义模板处理函数
@@ -83,9 +88,9 @@ func GetCatHTML(cid int64) string {
 		if idx > 0  {
 			s += `， `
 		}
-		condition := make(map[string]int64)
+		condition := make(map[string]interface{})
 		condition["mid"] = r.Mid
-		c := models.GetCategory(condition)
+		c,_ := models.GetCategory(condition)
 		s += `<a href="/category/`+ c.Slug +`">`+ c.Name +`</a>`
 		idx++
 	}
@@ -95,13 +100,21 @@ func GetCatHTML(cid int64) string {
 }
 
 //SubString 字串截取
-func SubString(s string, pos, length int) string {
-	runes := []rune(s)
-	l := pos + length
-	if l > len(runes) {
-		l = len(runes)
-	}
-	return string(runes[pos:l])
+func SubString(str string, begin, length int) string {
+    rs := []rune(str)
+    lth := len(rs)
+    if begin < 0 {
+        begin = 0
+    }
+    if begin >= lth {
+        begin = lth
+    }
+    end := begin + length
+
+    if end > lth {
+        end = lth
+    }
+    return string(rs[begin:end])
 }
 
 //GetMd5String md5方法
@@ -119,4 +132,34 @@ func GetGUID() string {
 		return ""
 	}
 	return GetMd5String(base64.URLEncoding.EncodeToString(b))
+}
+
+//ToMarkdown ...
+func ToMarkdown(str string) string {
+	return string(blackfriday.MarkdownBasic([]byte(str)))
+}
+
+//TrimHTML 过滤HTML标签
+func TrimHTML(src string) string {
+    //将HTML标签全转换成小写
+    re, _ := regexp.Compile("\\<[\\S\\s]+?\\>")
+    src = re.ReplaceAllStringFunc(src, strings.ToLower)
+    //去除STYLE
+    re, _ = regexp.Compile("\\<style[\\S\\s]+?\\</style\\>")
+    src = re.ReplaceAllString(src, "")
+    //去除SCRIPT
+    re, _ = regexp.Compile("\\<script[\\S\\s]+?\\</script\\>")
+    src = re.ReplaceAllString(src, "")
+    //去除所有尖括号内的HTML代码，并换成换行符
+    re, _ = regexp.Compile("\\<[\\S\\s]+?\\>")
+    src = re.ReplaceAllString(src, "\n")
+    //去除连续的换行符
+    re, _ = regexp.Compile("\\s{2,}")
+    src = re.ReplaceAllString(src, "\n")
+    return strings.TrimSpace(src)
+}
+
+//SubList 文章列表截取部分字符串
+func SubList(str string) string {
+	return SubString(str, 0, 130)
 }
