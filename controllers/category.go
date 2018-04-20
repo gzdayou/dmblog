@@ -18,7 +18,7 @@ func (c *CategoryController) Get() {
 	condition := make(map[string]interface{})
 	condition["slug"] = p
 	cat, err := models.GetCategory(condition)
-	beego.Alert("bbbbbb")
+
 	if err == nil {
 		r,_ := models.GetCateArticles(cat.Mid)
 		var cids []int64
@@ -31,10 +31,8 @@ func (c *CategoryController) Get() {
 		}
 
 		condition := make(map[string]interface{})
-		condition["cidin"] = cids
-		beego.Alert(len(cids))
-		
-		beego.Alert(len(cids))
+		condition["cidin"] = cids 
+
 		if _, list, e := models.ListArticle(condition, 1, 10); e == nil {
 			c.Data["list"] = list
 			c.Data["cat"] = cat

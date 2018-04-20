@@ -622,6 +622,11 @@ main .article-list a{
 }
 main .article-list a:last-child{ margin-bottom: 0; }
 
+main .article-list a.item-1 {
+    font-size: 18px;
+    font-weight: bold;
+}
+
 main .article-list a.item-2:before,
 main .article-list a.item-3:before,
 main .article-list a.item-4:before,

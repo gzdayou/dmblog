@@ -77,6 +77,7 @@ function single_tree() {
                 var item = document.createElement("a");
                     item.innerText = headings[i].innerText;
                     item.href = "#" + headings[i].innerText;
+                    item.className = "item-1";
 
                 switch (headings[i].tagName){
                     case "H2": item.className = "item-2"; break;

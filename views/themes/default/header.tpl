@@ -15,9 +15,6 @@
 </head>
 <body>
 <header>
-    <div class="head-title">
-        <h4>Hello World</h4>
-    </div>
     <div class="toggle-btn"></div>
     <div class="light-btn"></div>
     <div class="search-btn"></div>
@@ -30,6 +27,6 @@
             <a>分类</a>
             {{str2html getHeaderCatlist}}
         </li>
-        <li><a href="/page/about">关于</a></li>    
+        <li><a href="/page/about">关于</a></li>
     </ul>
 </header> 

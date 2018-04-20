@@ -1,5 +1,7 @@
 {{template "themes/default/header.tpl" .}}
-
+<link href="/themepth/js/highlight/styles/tomorrow-night-eighties.css" rel="stylesheet">  
+<script src="/themepth/js/highlight/highlight.pack.js"></script>  
+<script >hljs.initHighlightingOnLoad();</script>
 <script type="text/javascript">
 (function () {
     window.TypechoComment = {
