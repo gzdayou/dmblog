@@ -474,8 +474,13 @@ main .post-content h1:before, main .page-content h1:before,
 main .post-content h2:before, main .page-content h2:before,
 main .post-content h3:before, main .page-content h3:before{
     opacity: .5;
-    content: "#";
+    /* content: "#"; */
     margin-right: .3em;
+}
+
+main .post-content h1 {
+    font-weight: bold;
+    font-size: 1.4em;
 }
 
 main .post-near{ animation: fade-in-top .3s .3s both; }
@@ -623,7 +628,7 @@ main .article-list a{
 main .article-list a:last-child{ margin-bottom: 0; }
 
 main .article-list a.item-1 {
-    font-size: 18px;
+    font-size: 1.1em;
     font-weight: bold;
 }
 
