@@ -153,8 +153,10 @@ func ListArticle(condition map[string]interface{}, page int, limit int) (num int
 	start := (page - 1) * limit
 
 	var articles []Article
-	num, err1 := qs.OrderBy("-Cid").Limit(limit, start).All(&articles)
-	return num, articles, err1
+	_, err1 := qs.OrderBy("-Cid").Limit(limit, start).All(&articles)
+	cnt, _ := qs.Count()
+	//o.Raw("SELECT count(*) FROM " + beego.AppConfig.String("dbprefix") + "article" + "  where 1>0 " + cond).QueryRow(&totalItem)
+	return cnt, articles, err1
 }
 
 //GetArticle 根据博文ID获取博文详情

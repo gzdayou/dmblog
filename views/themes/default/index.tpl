@@ -17,6 +17,14 @@
             </div>
             {{end}}
         </section>
+        <section class="page-navigator">
+        {{if .hasPre}}
+        <a href="/?page={{.prePage}}" style="float: left;">上一页</a>
+        {{end}}
+        {{if .hasNext}}
+        <a href="/?page={{.nextPage}}" style="float: right;">下一页</a>
+        {{end}}
+        </section>
     </div>
 </main>
 
